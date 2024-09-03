@@ -31,4 +31,11 @@ public interface EmployeeMapper {
     void save(Employee employee);
 
     Page<Employee> pageQuary(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 根据主键id修改员工信息
+     * @param employee
+     */
+
+    void status(Employee employee);
 }

@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
@@ -14,8 +15,11 @@ import com.sky.vo.EmployeeLoginVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.MethodDelegation;
+import org.apache.logging.log4j.message.ReusableMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.service.ApiListing;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,15 +81,15 @@ public class EmployeeController {
     }
 
     /**
-     *  新增员工
+     * 新增员工
      *
      * @return
      */
 
     @PostMapping
     @ApiOperation("新增员工")
-    public Result save(@RequestBody EmployeeDTO employeeDTO){
-        log.info("新增员工:{}",employeeDTO);
+    public Result save(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("新增员工:{}", employeeDTO);
         employeeService.save(employeeDTO);
         return Result.success();
     }
@@ -93,15 +97,27 @@ public class EmployeeController {
 
     /**
      * 员工分页查询
-     *
      */
     @GetMapping("/page")
-    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
+    @ApiOperation(value = "员工的查询")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
         //输出日志
-        log.info("进行员工的分页查询：{}",employeePageQueryDTO);
+        log.info("进行员工的分页查询：{}", employeePageQueryDTO);
         //进行员工分页查询
         PageResult pageResult = employeeService.page(employeePageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 启用禁用员工账号
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation(value = "启用禁用员工账号")
+    public Result status(@PathVariable Integer status,Long id) {
+        log.info("启用禁用员工账号：{}，{}", status, id);
+        employeeService.status(status,id);
+        return Result.success();
     }
 
 
