@@ -23,6 +23,12 @@ import java.util.UUID;
 public class CommonConfiguration {
     @Autowired
     private  AliOssUtil aliOssUtil;
+
+    /**
+     * 文件上传的开发
+     * @param file
+     * @return
+     */
     @PostMapping("/upload")
     @ApiOperation(value = "进行文件上传")
     public Result<String> upload(MultipartFile file){
