@@ -36,11 +36,12 @@
                     update_time = #{updateTime},
                 </if>
                 <if test="updateUser != null">
-                    update_user = #{updateUser}
+                    update_user = #{updateUser},
                 </if>
             </set>
             where id = #{id}
     </update>
+
     <select id="pageQuery" resultType="com.sky.entity.Setmeal">
         select * from setmeal
         <where>
@@ -56,4 +57,13 @@
         </where>
         order by create_time desc
     </select>
+
+
+    <delete id="deleteBatch">
+        delete from setmeal
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

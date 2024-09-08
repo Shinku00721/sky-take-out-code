@@ -10,10 +10,13 @@
         </foreach>
     </insert>
 
+
     <select id="getDishId" resultType="java.lang.Long">
         select setmeal_id from setmeal_dish where dish_id in
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </select>
+
+
 </mapper>

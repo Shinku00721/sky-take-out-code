@@ -1,4 +1,5 @@
 package com.sky.controller.admin;
+
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/admin/setmeal")
@@ -22,6 +25,7 @@ public class SetmealController {
 
     /**
      * 新增套餐
+     *
      * @param setmealDTO
      * @return
      */
@@ -35,6 +39,7 @@ public class SetmealController {
 
     /**
      * 套餐的分页查询
+     *
      * @param setmealPageQueryDTO
      * @return
      */
@@ -44,5 +49,60 @@ public class SetmealController {
         log.info("套餐的分页查询:{}", setmealPageQueryDTO);
         PageResult PageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(PageResult);
+    }
+
+    /**
+     * 批量删除套餐
+     *
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("批量删除套餐")
+    public Result deleteBatch(@RequestParam List<Long> ids) {
+        log.info("批量删除套餐:{}", ids);
+        setmealService.deleteBatch(ids);
+        return Result.success();
+    }
+
+    /**
+     * 启用禁用套餐
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用禁用套餐")
+    public Result status(@PathVariable Integer status, Long id) {
+        log.info("启用禁用套餐:{},{}", status, id);
+        setmealService.status(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据id查询套餐
+     *
+     * @return
+     */
+    @GetMapping("{id}")
+    public Result<SetmealDTO> getById(@PathVariable Long id) {
+        log.info("根据id查询套餐的信息:{}",id);
+        SetmealDTO setmealDTO = setmealService.gteById(id);
+        return Result.success(setmealDTO);
+    }
+
+    /**
+     * 修改套餐
+     *
+     * @param setmealDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("修改套餐")
+    public Result update(@RequestBody SetmealDTO setmealDTO) {
+        log.info("修改套餐:{}", setmealDTO);
+        setmealService.update(setmealDTO);
+        return Result.success();
     }
 }
