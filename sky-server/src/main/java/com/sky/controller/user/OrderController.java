@@ -56,11 +56,31 @@ public class OrderController {
         return Result.success(orderPaymentVO);
     }
 
+    /**
+     * 查询订单的历史信息
+     * @param page
+     * @param pageSize
+     * @param status
+     * @return
+     */
     @GetMapping("/historyOrders")
     @ApiOperation("历史订单查询")
     public Result<PageResult> page(int page, int pageSize, Integer status) {
         PageResult pageResult = orderService.pageQuery(page, pageSize, status);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 查询订单的详情信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/orderDetail/{id}")
+    @ApiOperation("查询订单的详情信息")
+    public Result<OrderVO> list(@PathVariable Long id) {
+        log.info("查询订单的详情信息：{}", id);
+        OrderVO order = orderService.list(id);
+        return Result.success(order);
     }
 
 }
