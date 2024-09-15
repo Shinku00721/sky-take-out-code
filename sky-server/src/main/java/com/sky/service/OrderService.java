@@ -45,4 +45,23 @@ public interface OrderService {
      * @return
      */
     OrderVO list(Long id);
+
+    /**
+     * 取消订单
+     * @param id
+     */
+    void cancelOrder(Long id) throws Exception;
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    void repetiton(Long id);
+
+    /**
+     * 商家进行订单搜索
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    PageResult search(OrdersPageQueryDTO ordersPageQueryDTO);
 }

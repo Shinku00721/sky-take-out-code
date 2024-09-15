@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController("userOrderController")
 @RequestMapping("/user/order")
 @Slf4j
-@Api(tags = "C端订单接口")
+@Api(tags = "用户端订单接口")
 public class OrderController {
 
     @Autowired
@@ -58,6 +58,7 @@ public class OrderController {
 
     /**
      * 查询订单的历史信息
+     *
      * @param page
      * @param pageSize
      * @param status
@@ -72,6 +73,7 @@ public class OrderController {
 
     /**
      * 查询订单的详情信息
+     *
      * @param id
      * @return
      */
@@ -81,6 +83,29 @@ public class OrderController {
         log.info("查询订单的详情信息：{}", id);
         OrderVO order = orderService.list(id);
         return Result.success(order);
+    }
+
+    /**
+     * 取消订单
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    @PutMapping("/cancel/{id}")
+    @ApiOperation("取消订单")
+    public Result cancelOrder(@PathVariable Long id) throws Exception {
+        log.info("取消订单:{}", id);
+        orderService.cancelOrder(id);
+        return Result.success();
+    }
+
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("取消订单")
+    public Result repetition(@PathVariable Long id) {
+        log.info("再来一单:{}",id);
+        orderService.repetiton(id);
+        return Result.success();
     }
 
 }
