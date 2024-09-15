@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -19,6 +20,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.webSocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
     private AddressBookMapper addressBookMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户提交订单
@@ -108,6 +114,17 @@ public class OrderServiceImpl implements OrderService {
         orderSubmitVO.setOrderTime(order.getOrderTime());
         orderSubmitVO.setOrderAmount(order.getAmount());
         orderSubmitVO.setOrderNumber(order.getNumber());
+
+        //使用websocket进行来单提醒
+        Map map = new HashMap();
+        map.put("type",1);//1表示来单提醒
+        map.put("orderId",order.getId());//当前的订单id
+        map.put("content","订单号："+ order.getNumber());//输出当前的订单号
+        //转换json字符串
+        String string = JSON.toJSONString(map);
+
+        //将字符串进行输出
+        webSocketServer.sendToAllClient(string);
 
         return orderSubmitVO;
     }

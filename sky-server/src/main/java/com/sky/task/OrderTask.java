@@ -16,7 +16,7 @@ public class OrderTask {
     @Autowired
     private OrderMapper orderMapper;
 
-    @Scheduled(cron = "0 1 * * * ? *")
+    @Scheduled(cron = "0 1 * * * ?")
     public void TimeOutOrder() {
         log.info("定时处理未支付的订单：{}", LocalDateTime.now());
         //查询订单的数据
@@ -34,7 +34,7 @@ public class OrderTask {
             }
         }
     }
-    @Scheduled(cron = "0 0 1 * * ? *")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void processDeliveryOrder(){
         log.info("定时处理已经派送的订单");
         //查询订单的数据
@@ -47,6 +47,7 @@ public class OrderTask {
                 order.setStatus(Orders.CANCELLED);
                 order.setCancelTime(LocalDateTime.now());
                 order.setCancelReason("订单已派送，已取消");
+
                 orderMapper.update(order);
             }
         }
