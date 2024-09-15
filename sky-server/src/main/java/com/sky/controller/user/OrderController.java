@@ -100,11 +100,29 @@ public class OrderController {
         return Result.success();
     }
 
+    /**
+     * 再来一单
+     * @param id
+     * @return
+     */
     @PostMapping("/repetition/{id}")
-    @ApiOperation("取消订单")
+    @ApiOperation("再来一单")
     public Result repetition(@PathVariable Long id) {
         log.info("再来一单:{}",id);
         orderService.repetiton(id);
+        return Result.success();
+    }
+
+    /**
+     * 用户催单
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("用户催单")
+    public Result reminder(@PathVariable  Long id){
+        log.info("用户催单");
+        orderService.reminder(id);
         return Result.success();
     }
 

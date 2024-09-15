@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,9 +114,9 @@ public class OrderServiceImpl implements OrderService {
 
         //使用websocket进行来单提醒
         Map map = new HashMap();
-        map.put("type",1);//1表示来单提醒
-        map.put("orderId",order.getId());//当前的订单id
-        map.put("content","订单号："+ order.getNumber());//输出当前的订单号
+        map.put("type", 1);//1表示来单提醒
+        map.put("orderId", order.getId());//当前的订单id
+        map.put("content", "订单号：" + order.getNumber());//输出当前的订单号
         //转换json字符串
         String string = JSON.toJSONString(map);
 
@@ -523,5 +520,25 @@ public class OrderServiceImpl implements OrderService {
         orders.setDeliveryTime(LocalDateTime.now());
 
         orderMapper.update(orders);
+    }
+
+    @Override
+    public void reminder(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+
+        // 校验订单是否存在，并且状态为4
+        if (ordersDB == null || !ordersDB.getStatus().equals(Orders.DELIVERY_IN_PROGRESS)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+
+        Map map = new HashMap();
+        map.put("type", 2);//2表示用户催单
+        map.put("orderId", id);
+        map.put("content", "订单号：" + ordersDB.getNumber());
+
+        //使用wedsocket进行消息的发送
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 }
