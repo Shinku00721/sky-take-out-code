@@ -4,9 +4,12 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.IntegerField;
 import org.apache.poi.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +49,7 @@ public class ReportServiceImpl implements ReportService {
             begin = begin.plusDays(1);
             datelist.add(begin);
         }
-        List<Double> turnover= new ArrayList<>();
+        List<Double> turnover = new ArrayList<>();
         //查询营业额数据
         for (LocalDate date : datelist) {
             //获取一天的开始时间和结束时间
@@ -58,7 +61,7 @@ public class ReportServiceImpl implements ReportService {
             map.put("end", endTime);
             map.put("status", Orders.COMPLETED);
             Double sum = orderMapper.sumByMap(map);
-            if(sum == null){
+            if (sum == null) {
                 sum = 0.0;
             }
             turnover.add(sum);
@@ -76,6 +79,7 @@ public class ReportServiceImpl implements ReportService {
 
     /**
      * 开始进行用户数据统计
+     *
      * @param begin
      * @param end
      * @return
@@ -101,14 +105,14 @@ public class ReportServiceImpl implements ReportService {
             //将开始时间和结束时间存入map集合中
             Map map = new HashMap();
 
-            map.put("end",endTime);
+            map.put("end", endTime);
 
             //根据结束时间，查询总用户数据
             Integer sum = userMapper.getSumBymap(map);
             sumlist.add(sum);//放入集合中
 
             //根据结束和开始时间，查询新增的用户数据
-            map.put("begin",beginTime);
+            map.put("begin", beginTime);
             Integer newUser = userMapper.getNewBymap(map);
             newUserList.add(newUser);//放入集合中
         }
@@ -121,5 +125,68 @@ public class ReportServiceImpl implements ReportService {
         return userReportVO;
 
 
+    }
+
+    /**
+     * 统计订单数据
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        //计算日期，将日期放入list集合中
+        List<LocalDate> datelist = new ArrayList<>();
+        datelist.add(begin);
+
+        //设置日期的结束时间
+        while (!begin.equals(end)) {
+            begin = begin.plusDays(1);
+            datelist.add(begin);
+        }
+
+        List<Integer> orderCountList = new ArrayList<>();//存放每天订单的总数量
+        List<Integer> vailidOrderCountList = new ArrayList<>();//存放每天的有效订单数量
+        for (LocalDate date : datelist) {
+            //设置开始时间和结束时间
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+
+            //将数据放入map集合中
+            Map map = new HashMap();
+            map.put("begin", beginTime);
+            map.put("end", endTime);
+
+            //查询每天订单的总数量
+            Integer count = orderMapper.orderCount(map);
+            orderCountList.add(count);//放入集合中
+
+            map.put("status", Orders.COMPLETED);
+            //查询每天的有效订单数量
+            Integer vaild = orderMapper.vaildorderCount(map);
+            vailidOrderCountList.add(vaild);
+        }
+
+
+        //获取订单的总数量
+        Integer totalorderCount = orderCountList.stream().reduce(Integer::sum).get();
+        //获取有效订单的总数
+        Integer totalvaildorderCount = vailidOrderCountList.stream().reduce(Integer::sum).get();
+
+        //获取完成率
+        Double completionRate = 0.0;
+        if(completionRate != 0.0){
+            completionRate = totalvaildorderCount.doubleValue() / totalorderCount;
+        }
+
+        //封装数据
+        OrderReportVO orderReportVO = new OrderReportVO();
+        orderReportVO.setDateList(StringUtils.join(datelist, ","));
+        orderReportVO.setOrderCountList(StringUtils.join(orderCountList, ","));
+        orderReportVO.setValidOrderCountList(StringUtils.join(vailidOrderCountList, ","));
+        orderReportVO.setTotalOrderCount(totalorderCount);
+        orderReportVO.setValidOrderCount(totalvaildorderCount);
+        return orderReportVO;
     }
 }
