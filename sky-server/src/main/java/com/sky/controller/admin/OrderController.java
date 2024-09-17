@@ -19,7 +19,7 @@ import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("AdminOrderController")
-@RequestMapping("/user/order")
+@RequestMapping("/admin/order")
 @Slf4j
 @Api(tags = "管理端端订单接口")
 public class OrderController {
@@ -34,7 +34,7 @@ public class OrderController {
      */
     @GetMapping("/conditionSearch")
     @ApiOperation("订单搜索")
-    public Result<PageResult> search(@PathVariable OrdersPageQueryDTO ordersPageQueryDTO) {
+    public Result<PageResult> search(OrdersPageQueryDTO ordersPageQueryDTO) {
         log.info("开始进行搜索");
         PageResult pageResult = orderService.search(ordersPageQueryDTO);
         return Result.success(pageResult);
